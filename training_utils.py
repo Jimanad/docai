@@ -354,6 +354,48 @@ def entity_extraction(main_project_id,
   output_bucket_name = main_project_id + "-lcm"
   dest_uri = f"gs://{output_bucket_name}/{output_directory}/entity_extraction.csv"
 
+  # Set dataset name and metadata.
+  now = datetime.datetime.now().strftime("_%m%d%Y_%H%M%S")
+  dataset_metadata = {
+    "display_name": output_directory + now,
+    "text_extraction_dataset_metadata": {}
+  }
+
+  # Set model name and model metadata for the dataset.
+  model_metadata = {
+    "display_name": output_directory + now,
+    "dataset_id": None,
+    "text_extraction_model_metadata": {}
+  }
+
+  # Create AutoML model for entity extraction
+  create_automl_model(main_project_id,
+                      region,
+                      dataset_metadata,
+                      model_metadata,
+                      dest_uri,
+                      service_acct)
+
+  # Remove all files in the temporary directory
+  shutil.rmtree(temp_directory)
+
+def prepare_dataset(main_project_id,
+                      data_project_id,
+                      dataset_id,
+                      table_id,
+                      service_acct,
+                      input_bucket_name,
+                      region,
+                      config,
+                      output_directory="demo_data",
+                      temp_directory = "./tmp/google"):
+  """Create AutoML entity extraction model."""
+  logger.info(f"Starting AutoML entity extraction.")
+  
+  # Create training data
+  output_bucket_name = main_project_id + "-lcm"
+  dest_uri = f"gs://{output_bucket_name}/{output_directory}/entity_extraction.csv"
+
   df = bq_to_df(project_id=data_project_id,
                 dataset_id=dataset_id,
                 table_id=table_id,
@@ -380,31 +422,8 @@ def entity_extraction(main_project_id,
                      full_gcs_path=dest_uri,
                      service_acct=service_acct)
 
-  # Set dataset name and metadata.
-  now = datetime.datetime.now().strftime("_%m%d%Y_%H%M%S")
-  dataset_metadata = {
-    "display_name": output_directory + now,
-    "text_extraction_dataset_metadata": {}
-  }
-
-  # Set model name and model metadata for the dataset.
-  model_metadata = {
-    "display_name": output_directory + now,
-    "dataset_id": None,
-    "text_extraction_model_metadata": {}
-  }
-
-  # Create AutoML model for entity extraction
-  create_automl_model(main_project_id,
-                      region,
-                      dataset_metadata,
-                      model_metadata,
-                      dest_uri,
-                      service_acct)
-
   # Remove all files in the temporary directory
   shutil.rmtree(temp_directory)
-
 
 def bq_to_df(project_id, dataset_id, table_id, service_acct):
   """Fetches Data From BQ Dataset, outputs as dataframe."""
