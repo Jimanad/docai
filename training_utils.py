@@ -411,7 +411,7 @@ def prepare_dataset(main_project_id,
   for blob in blobs:
     resourse_uri = f"gs://{input_bucket_name}/{blob.name}"
     rows_to_insert.append(resourse_uri)
-    logger.info(f"Added into BQ : {blob.name}.")
+    logger.info(f"Added into BQ : {resourse_uri}.")
   errors = client.insert_rows(table, rows_to_insert)  # API request
   if errors == []:
    	print("New rows have been added.")
