@@ -423,7 +423,7 @@ def prepare_dataset(main_project_id,
                      service_acct=service_acct)
 
   # Remove all files in the temporary directory
-  shutil.rmtree(temp_directory)
+  # shutil.rmtree(temp_directory)
 
 def bq_to_df(project_id, dataset_id, table_id, service_acct):
   """Fetches Data From BQ Dataset, outputs as dataframe."""
@@ -520,7 +520,7 @@ def create_unlabelledjsonl(pdf_text, value_dict):
   """
 
   pdf_text = pdf_text.replace('"', '')
-  jsonl = ['''{''']
+  jsonl = ['{']
   
   jsonl.append(u'''"text_snippet":{{"content":"{}"}}}}'''.format(pdf_text.replace('\n', '\\n')))
 
