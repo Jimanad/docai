@@ -406,7 +406,7 @@ def prepare_dataset(main_project_id,
 
   storage_client = storage.Client.from_service_account_json(service_acct)
   input_bucket_name=config["pdp_project"]["bucket_name"]
-  blobs = storage_client.list_blobs(input_bucket_name, prefix="demo_data/pdf")
+  blobs = storage_client.list_blobs(input_bucket_name, prefix="/pdf")
   rows_to_insert = []
   for blob in blobs:
 	  resourse_uri = f"gs://{input_bucket_name}/{blob.name}"
