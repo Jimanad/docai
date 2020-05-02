@@ -412,7 +412,7 @@ def prepare_dataset(main_project_id,
                                 f"{temp_directory}/")
     with open(txt_file, "r") as f:
       _text = f.read()
-      jsonl = create_jsonl(_text, df_dict[_index])
+      jsonl = create_unlabelledjsonl(_text, df_dict[_index])
       LIST_JSONL.append(jsonl)
 
   save_jsonl_content(jsonl="\n".join(LIST_JSONL),
@@ -539,6 +539,21 @@ def create_jsonl(pdf_text, value_dict):
   jsonl[-1] = jsonl[-1].replace('"},', '"}')  # Remove last comma
   jsonl.append(u'''],"text_snippet":{{"content":"{}"}}}}'''.format(pdf_text.replace('\n', '\\n')))
 
+  jsonl_final = "".join(jsonl)
+  return jsonl_final
+
+  def create_unlabelledjsonl(pdf_text, value_dict):
+  """Constructs the jsonl for a given pdf.
+
+  Args:
+    pdf_text: Text of the pdf.
+    value_dict: a dictionary of fieldname: fieldvalue.
+  Returns:
+    jsonl file suitable for training AutoML NER model
+  """
+
+  pdf_text = pdf_text.replace('"', '')
+  jsonl.append('''{{"text_snippet":{{"content":"{}"}}}}'''.format(pdf_text.replace('\n', '\\n')))
   jsonl_final = "".join(jsonl)
   return jsonl_final
 
