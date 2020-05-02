@@ -402,16 +402,16 @@ def prepare_dataset(main_project_id,
                 service_acct=service_acct)
   # add values to big query table
   client = bigquery.Client.from_service_account_json(service_acct)
-  table = client.get_table(f"{project_id}.{dataset_id}.{table_id}")
+  table = client.get_table(f"{main_project_id}.{dataset_id}.{table_id}")
 
   storage_client = storage.Client.from_service_account_json(service_acct)
   input_bucket_name=config["pdp_project"]["bucket_name"]
   blobs = storage_client.list_blobs(input_bucket_name, prefix="/pdf")
   rows_to_insert = []
   for blob in blobs:
-	  resourse_uri = f"gs://{input_bucket_name}/{blob.name}"
+    resourse_uri = f"gs://{input_bucket_name}/{blob.name}"
     rows_to_insert.append(resourse_uri)
-  errors = bigquery_client.insert_rows(table, rows_to_insert)  # API request
+  errors = client.insert_rows(table, rows_to_insert)  # API request
   if errors == []:
    	print("New rows have been added.")
   # end of BQ insertion
