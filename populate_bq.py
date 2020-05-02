@@ -20,7 +20,7 @@ config = yaml.safe_load(open("config.yaml", "r"))
 
 # Create data needed for training AutoML models below
 # Create AutoML Natural Entity Recognition model
-training_utils.prepare_datasetcsv(
+training_utils.populate_bq(
     main_project_id=config["pipeline_project"]["project_id"],
     data_project_id=config["pdp_project"]["project_id"],
     dataset_id=config["pdp_project"]["dataset_id"],

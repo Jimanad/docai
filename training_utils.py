@@ -379,7 +379,7 @@ def entity_extraction(main_project_id,
   # Remove all files in the temporary directory
   shutil.rmtree(temp_directory)
 
-def prepare_dataset(main_project_id,
+def prepare_datasetcsv(main_project_id,
                       data_project_id,
                       dataset_id,
                       table_id,
@@ -390,7 +390,7 @@ def prepare_dataset(main_project_id,
                       output_directory="demo_data",
                       temp_directory = "./tmp/google"):
   """Create AutoML entity extraction model."""
-  logger.info(f"Starting AutoML entity extraction.")
+  logger.info(f"Starting dataset csv preparation.")
   
   # Create training data
   output_bucket_name = main_project_id + "-lcm"
@@ -400,25 +400,6 @@ def prepare_dataset(main_project_id,
                 dataset_id=dataset_id,
                 table_id=table_id,
                 service_acct=service_acct)
-  # add values to big query table
-  client = bigquery.Client.from_service_account_json(service_acct)
-  table = client.get_table(f"{main_project_id}.{dataset_id}.{table_id}")
-
-  storage_client = storage.Client.from_service_account_json(service_acct)
-  input_bucket_name=config["pdp_project"]["bucket_name"]
-  blobs = storage_client.list_blobs(input_bucket_name)
-  rows_to_insert = []
-  for blob in blobs:
-    resource_uri = f"gs://{input_bucket_name}/{blob.name}"
-    resource_tuple = (resource_uri,)
-    rows_to_insert.append(resource_tuple)
-   
-  logger.info(f"Tupeles value : {rows_to_insert}.")
-  errors = client.insert_rows(table, rows_to_insert)  # API request
-  if errors == []:
-   	print("New rows have been added.")
-  # end of BQ insertion
-
   fields_to_extract = config["model_ner"]["fields_to_extract"]
   field_names = [field["field_name"] for field in fields_to_extract]
   df = df[field_names]
@@ -440,6 +421,41 @@ def prepare_dataset(main_project_id,
   save_jsonl_content(jsonl=f", gs://{output_bucket_name}/{output_directory}/entity_extraction.jsonl",
                      full_gcs_path=dest_uri,
                      service_acct=service_acct)
+
+  # Remove all files in the temporary directory
+  # shutil.rmtree(temp_directory)
+
+def populate_bq(main_project_id,
+                      data_project_id,
+                      dataset_id,
+                      table_id,
+                      service_acct,
+                      input_bucket_name,
+                      region,
+                      config,
+                      output_directory="demo_data",
+                      temp_directory = "./tmp/google"):
+  """Create AutoML entity extraction model."""
+  logger.info(f"Starting BQ table population.")
+  
+  # add values to big query table
+  client = bigquery.Client.from_service_account_json(service_acct)
+  table = client.get_table(f"{main_project_id}.{dataset_id}.{table_id}")
+
+  storage_client = storage.Client.from_service_account_json(service_acct)
+  input_bucket_name=config["pdp_project"]["bucket_name"]
+  blobs = storage_client.list_blobs(input_bucket_name)
+  rows_to_insert = []
+  for blob in blobs:
+    resource_uri = f"gs://{input_bucket_name}/{blob.name}"
+    resource_tuple = (resource_uri,)
+    rows_to_insert.append(resource_tuple)
+   
+  logger.info(f"Tupeles value : {rows_to_insert}.")
+  errors = client.insert_rows(table, rows_to_insert)  # API request
+  if errors == []:
+   	print("New rows have been added.")
+  # end of BQ insertion
 
   # Remove all files in the temporary directory
   # shutil.rmtree(temp_directory)
