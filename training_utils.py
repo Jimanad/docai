@@ -411,10 +411,9 @@ def prepare_dataset(main_project_id,
   for blob in blobs:
 	  resourse_uri = f"gs://{input_bucket_name}/{blob.name}"
     rows_to_insert.append(resourse_uri)
-  
   errors = bigquery_client.insert_rows(table, rows_to_insert)  # API request
-    if errors == []:
-    	print("New rows have been added.")
+  if errors == []:
+   	print("New rows have been added.")
   # end of BQ insertion
 
   fields_to_extract = config["model_ner"]["fields_to_extract"]
