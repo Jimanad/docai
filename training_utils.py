@@ -509,6 +509,23 @@ def create_automl_model(project_id,
   logger.info(f"Training operation name: {response.operation.name}")
   logger.info("Training started. This will take a while.")
 
+def create_unlabelledjsonl(pdf_text, value_dict):
+  """Constructs the jsonl for a given pdf.
+
+  Args:
+    pdf_text: Text of the pdf.
+    value_dict: a dictionary of fieldname: fieldvalue.
+  Returns:
+    jsonl file suitable for training AutoML NER model
+  """
+
+  pdf_text = pdf_text.replace('"', '')
+  jsonl = ['''{''']
+  
+  jsonl.append(u'''"text_snippet":{{"content":"{}"}}}}'''.format(pdf_text.replace('\n', '\\n')))
+
+  jsonl_final = "".join(jsonl)
+  return jsonl_final
 
 def create_jsonl(pdf_text, value_dict):
   """Constructs the jsonl for a given pdf.
@@ -539,21 +556,6 @@ def create_jsonl(pdf_text, value_dict):
   jsonl[-1] = jsonl[-1].replace('"},', '"}')  # Remove last comma
   jsonl.append(u'''],"text_snippet":{{"content":"{}"}}}}'''.format(pdf_text.replace('\n', '\\n')))
 
-  jsonl_final = "".join(jsonl)
-  return jsonl_final
-
-  def create_unlabelledjsonl(pdf_text, value_dict):
-  """Constructs the jsonl for a given pdf.
-
-  Args:
-    pdf_text: Text of the pdf.
-    value_dict: a dictionary of fieldname: fieldvalue.
-  Returns:
-    jsonl file suitable for training AutoML NER model
-  """
-
-  pdf_text = pdf_text.replace('"', '')
-  jsonl.append('''{{"text_snippet":{{"content":"{}"}}}}'''.format(pdf_text.replace('\n', '\\n')))
   jsonl_final = "".join(jsonl)
   return jsonl_final
 
