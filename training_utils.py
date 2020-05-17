@@ -178,6 +178,32 @@ def convert_pdfs(main_project_id,
         f"gsutil -m cp {temp_directory}/*.png gs://{output_bucket_name}/{output_directory}/png",
         shell=True)
 
+def move_pdfs(main_project_id,
+                 input_bucket_name,
+                 region,
+                 service_acct,
+                 output_directory="demo_data",
+                 temp_directory="./tmp/google"):
+    """Converts all pdfs in a bucket to png and txt using OCR.
+
+    Args:
+      input_bucket_name (string): Bucket of Public PDFs
+      output_bucket_name (string): Bucket for Converted PNGs
+      temp_directory (string): Temporary Local Directory for coversion
+    """
+    logger.info(f"Uploading png file to GCS.")
+    output_bucket_name = main_project_id + "-vcm"
+
+    # Create Bucket if it doesn"t exist
+    subprocess.run(
+        f"gsutil mb -p {main_project_id} -l {region} gs://{output_bucket_name}",
+        shell=True)
+
+    subprocess.run(
+        f"gsutil -m cp {temp_directory}/*.png gs://{output_bucket_name}/{output_directory}/png",
+        shell=True)
+
+
 def image_classification(main_project_id,
                          data_project_id,
                          dataset_id,
